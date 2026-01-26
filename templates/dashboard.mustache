@@ -1,0 +1,138 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_customdashboard/dashboard
+
+    Custom Dashboard block template.
+
+    Context variables required for this template:
+    * children - Array of child users
+    * haschildren - Boolean if there are children
+    * courses - Array of courses
+    * hascourses - Boolean if there are courses
+}}
+
+<div class="block-customdashboard">
+    {{#haschildren}}
+    <div class="child-selector-wrapper mb-3 d-flex align-items-center gap-3">
+        <label for="child-selector" class="form-label">{{#str}}selectchild, block_customdashboard{{/str}}</label>
+        <select id="child-selector" class="form-select">
+            {{#children}}
+            <option value="{{id}}" {{#selected}}selected{{/selected}}>{{fullname}}</option>
+            {{/children}}
+        </select>
+    </div>
+
+    {{#hascourses}}
+    <div class="courses-container">
+        <div class="row">
+            {{#courses}}
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <div class="course-card card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{url}}" target="_blank">{{fullname}}</a>
+                        </h5>
+                        
+                        <div class="course-info mt-3">
+                            <div class="info-item mb-2">
+                                <strong>{{#str}}courseprogress, block_customdashboard{{/str}}:</strong>
+                                <div class="progress mt-1" style="height: 25px;">
+                                    <div class="progress-bar {{progressclass}}" role="progressbar" 
+                                         style="width: {{progress}}%;" 
+                                         aria-valuenow="{{progress}}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{progress}}%
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{progresstext}}</small>
+                            </div>
+
+                            <div class="info-item mb-5">
+                                <strong>{{#str}}grade, block_customdashboard{{/str}}:</strong>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>{{#str}}achievedgrade, block_customdashboard{{/str}}</th>
+                                                <th>{{#str}}percentage, block_customdashboard{{/str}}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{grade}} / {{grademax}}</td>
+                                                <td><span class="badge {{gradeclass}}">{{gradetext}}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="info-item mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-primary btn-sm view-activities" 
+                                            data-courseid="{{id}}" 
+                                            data-coursename="{{fullname}}">
+                                        <i class="fa fa-list"></i> {{#str}}viewactivities, block_customdashboard{{/str}}
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm view-grades" 
+                                            data-courseid="{{id}}" 
+                                            data-coursename="{{fullname}}">
+                                        <i class="fa fa-chart-bar"></i> {{#str}}viewgrades, block_customdashboard{{/str}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{! Activity Modal Data }}
+                        <div class="activity-data" data-courseid="{{id}}" style="display:none;">
+                            {{#activities}}
+                            <div class="activity-item" data-name="{{name}}" data-type="{{type}}" 
+                                 data-completed="{{completed}}" data-completedtext="{{completedtext}}" 
+                                 data-completedclass="{{completedclass}}"></div>
+                            {{/activities}}
+                        </div>
+
+                        {{! Grades Modal Data }}
+                        <div class="grades-data" data-courseid="{{id}}" style="display:none;" 
+                             data-finalgrade="{{finalgrade}}" data-finalgradetext="{{finalgradetext}}">
+                            {{#gradeslist}}
+                            <div class="grade-item" data-name="{{name}}" data-grade="{{grade}}" 
+                                 data-hasgrade="{{hasgrade}}" data-isscale="{{isscale}}"
+                                 data-scaleitems="{{#scaleitems}}{{.}},{{/scaleitems}}"
+                                 data-achievedscale="{{achievedscale}}"
+                                 data-grademax="{{grademax}}"
+                                 data-gradevalue="{{gradevalue}}"></div>
+                            {{/gradeslist}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/courses}}
+        </div>
+    </div>
+    {{/hascourses}}
+
+    {{^hascourses}}
+    <div class="alert alert-info">
+        {{#str}}nocourses, block_customdashboard{{/str}}
+    </div>
+    {{/hascourses}}
+
+    {{/haschildren}}
+</div>
