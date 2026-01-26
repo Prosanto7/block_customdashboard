@@ -55,12 +55,14 @@
 }
 
 .block-customdashboard .progress {
-    border-radius: 5px;
+    background-color: rgb(37 161 142 / .16) !important;
+    border-radius: 999px;
 }
 
 .block-customdashboard .progress-bar {
-    font-weight: 600;
-    font-size: 0.85rem;
+    background-color: #25a18e;
+    background-image: linear-gradient(to right, #25a18e 0%, #005eb8 100%);
+    border-radius: 999px;
 }
 
 .block-customdashboard .badge {

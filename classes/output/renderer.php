@@ -123,6 +123,8 @@ class renderer extends plugin_renderer_base {
                 'gradetext' => $gradeinfo['text'],
                 'gradeclass' => $gradeinfo['class'],
                 'grademax' => $gradeinfo['grademax'],
+                'hasgrade' => $gradeinfo['hasgrade'],
+                'percentage' => $gradeinfo['percentage'],
                 'activitycompleted' => $activitycompletion['completed'],
                 'activitytotal' => $activitycompletion['total'],
                 'activitypercentage' => $activitycompletion['percentage'],
@@ -201,6 +203,9 @@ class renderer extends plugin_renderer_base {
                 'grade' => '-',
                 'text' => '-',
                 'class' => 'bg-secondary',
+                'grademax' => 0,
+                'percentage' => 0,
+                'hasgrade' => false,
             ];
         }
 
@@ -214,6 +219,9 @@ class renderer extends plugin_renderer_base {
                 'grade' => '-',
                 'text' => '-',
                 'class' => 'bg-secondary',
+                'grademax' => 0,
+                'percentage' => 0,
+                'hasgrade' => false,
             ];
         }
 
@@ -236,7 +244,9 @@ class renderer extends plugin_renderer_base {
             'grade' => round($gradetext, 2),
             'text' => round($percentage, 1) . '%',
             'class' => $class,
-            'grademax' => round($gradeitem->grademax, 2)
+            'grademax' => round($gradeitem->grademax, 2),
+            'percentage' => round($percentage, 1),
+            'hasgrade' => true,
         ];
     }
 

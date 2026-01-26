@@ -42,8 +42,8 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                 Str.get_strings(stringPromises).then(function(strings) {
                     let activitiesHtml = '<table class="table table-striped"><thead><tr>' +
                         '<th>' + strings[0] + '</th>' +
-                        '<th>' + strings[1] + '</th>' +
-                        '<th>' + strings[2] + '</th>' +
+                        '<th class="text-center">' + strings[1] + '</th>' +
+                        '<th class="text-center">' + strings[2] + '</th>' +
                         '</tr></thead><tbody>';
 
                     if (activityData.find('.activity-item').length > 0) {
@@ -55,8 +55,9 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
 
                             activitiesHtml += '<tr>' +
                                 '<td>' + name + '</td>' +
-                                '<td>' + type + '</td>' +
-                                '<td><span class="badge ' + completedClass + '">' + completedText + '</span></td>' +
+                                '<td class="text-center">' + type + '</td>' +
+                                '<td class="text-center"><span class="badge ' + completedClass + '">'
+                                + completedText + '</span></td>' +
                                 '</tr>';
                         });
                     } else {
@@ -69,8 +70,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                     return ModalFactory.create({
                         type: ModalFactory.types.DEFAULT,
                         title: strings[4],
-                        body: activitiesHtml,
-                        large: true
+                        body: activitiesHtml
                     });
                 }).then(function(modal) {
                     modal.show();
@@ -79,8 +79,8 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                     // Fallback if string loading fails
                     let activitiesHtml = '<table class="table table-striped"><thead><tr>' +
                         '<th>Activity Name</th>' +
-                        '<th>Type</th>' +
-                        '<th>Status</th>' +
+                        '<th class="text-center">Type</th>' +
+                        '<th class="text-center">Status</th>' +
                         '</tr></thead><tbody>';
 
                     if (activityData.find('.activity-item').length > 0) {
@@ -92,8 +92,9 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
 
                             activitiesHtml += '<tr>' +
                                 '<td>' + name + '</td>' +
-                                '<td>' + type + '</td>' +
-                                '<td><span class="badge ' + completedClass + '">' + completedText + '</span></td>' +
+                                '<td class="text-center">' + type + '</td>' +
+                                '<td class="text-center"><span class="badge ' + completedClass + '">'
+                                + completedText + '</span></td>' +
                                 '</tr>';
                         });
                     } else {
@@ -165,13 +166,15 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                                 '</tr>';
                         });
 
-                        // Add final grade row
+                        // Add final grade row only if grade exists
                         const finalGrade = gradesData.data('finalgrade');
                         const finalGradeText = gradesData.data('finalgradetext');
 
-                        gradesHtml += '<tr class="table-primary"><td><strong>' +
-                            strings[3] +
-                            '</strong></td><td><strong>' + finalGrade + ' (' + finalGradeText + ')</strong></td></tr>';
+                        if (finalGrade && finalGrade !== '-') {
+                            gradesHtml += '<tr class="table-primary"><td><strong>' +
+                                strings[3] +
+                                '</strong></td><td><strong>' + finalGrade + ' (' + finalGradeText + ')</strong></td></tr>';
+                        }
                     } else {
                         gradesHtml += '<tr><td colspan="2" class="text-center">' +
                             strings[4] + '</td></tr>';
@@ -222,12 +225,14 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                                 '</tr>';
                         });
 
-                        // Add final grade row
+                        // Add final grade row only if grade exists
                         const finalGrade = gradesData.data('finalgrade');
                         const finalGradeText = gradesData.data('finalgradetext');
 
-                        gradesHtml += '<tr class="table-primary"><td><strong>Final Grade</strong></td>' +
-                            '<td><strong>' + finalGrade + ' (' + finalGradeText + ')</strong></td></tr>';
+                        if (finalGrade && finalGrade !== '-') {
+                            gradesHtml += '<tr class="table-primary"><td><strong>Final Grade</strong></td>' +
+                                '<td><strong>' + finalGrade + ' (' + finalGradeText + ')</strong></td></tr>';
+                        }
                     } else {
                         gradesHtml += '<tr><td colspan="2" class="text-center">No grades</td></tr>';
                     }
@@ -237,8 +242,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                     return ModalFactory.create({
                         type: ModalFactory.types.DEFAULT,
                         title: 'Grades for ' + courseName,
-                        body: gradesHtml,
-                        large: true
+                        body: gradesHtml
                     }).then(function(modal) {
                         modal.show();
                     });

@@ -50,51 +50,62 @@
                         
                         <div class="course-info mt-3">
                             <div class="info-item mb-2">
-                                <strong>{{#str}}courseprogress, block_customdashboard{{/str}}:</strong>
-                                <div class="progress mt-1" style="height: 25px;">
-                                    <div class="progress-bar {{progressclass}}" role="progressbar" 
+                                <strong>{{#str}}courseprogress, block_customdashboard{{/str}}: {{progress}}%</strong>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" role="progressbar" 
                                          style="width: {{progress}}%;" 
                                          aria-valuenow="{{progress}}" 
                                          aria-valuemin="0" 
                                          aria-valuemax="100">
-                                        {{progress}}%
+                                        
                                     </div>
                                 </div>
                                 <small class="text-muted">{{progresstext}}</small>
                             </div>
 
-                            <div class="info-item mb-5">
-                                <strong>{{#str}}grade, block_customdashboard{{/str}}:</strong>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>{{#str}}achievedgrade, block_customdashboard{{/str}}</th>
-                                                <th>{{#str}}percentage, block_customdashboard{{/str}}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>{{grade}} / {{grademax}}</td>
-                                                <td><span class="badge {{gradeclass}}">{{gradetext}}</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            {{#hasgrade}}
+                            <div class="info-item mb-3">
+                                <div class="border rounded">
+                                    <!-- Header -->
+                                    <div class="d-flex text-center bg-light font-weight-bold">
+                                        <div class="flex-fill py-2">
+                                            {{#str}}achievedgrade, block_customdashboard{{/str}}
+                                        </div>
+                                        <div class="flex-fill py-2">
+                                            {{#str}}percentage, block_customdashboard{{/str}}
+                                        </div>
+                                    </div>
+                                    <!-- Body -->
+                                    <div class="d-flex text-center">
+                                        <div class="flex-fill py-2">
+                                            <span class="badge badge-primary p-2">
+                                                {{grade}} / {{grademax}}
+                                            </span>
+                                        </div>
+                                        <div class="flex-fill py-2">
+                                            <span class="badge badge-primary p-2">
+                                                {{gradetext}}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            {{/hasgrade}}
 
                             <div class="info-item mb-2">
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-center align-items-center gap-3">
                                     <button type="button" class="btn btn-primary btn-sm view-activities" 
                                             data-courseid="{{id}}" 
                                             data-coursename="{{fullname}}">
                                         <i class="fa fa-list"></i> {{#str}}viewactivities, block_customdashboard{{/str}}
                                     </button>
+                                    {{#hasgrade}}
                                     <button type="button" class="btn btn-info btn-sm view-grades" 
                                             data-courseid="{{id}}" 
                                             data-coursename="{{fullname}}">
                                         <i class="fa fa-chart-bar"></i> {{#str}}viewgrades, block_customdashboard{{/str}}
                                     </button>
+                                    {{/hasgrade}}
                                 </div>
                             </div>
                         </div>
