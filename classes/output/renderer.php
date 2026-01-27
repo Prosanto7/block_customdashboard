@@ -97,6 +97,18 @@ class renderer extends plugin_renderer_base {
             $coursecontext = \context_course::instance($course->id);
             $courseurl = new \moodle_url('/course/view.php', ['id' => $course->id]);
 
+            // Get course category.
+            $coursecategory = '';
+            if ($course->category) {
+                $category = $DB->get_record('course_categories', ['id' => $course->category]);
+                if ($category) {
+                    $coursecategory = format_string($category->name);
+                }
+            }
+
+            // Get course image.
+            $courseimage = $this->get_course_image($course);
+
             // Get course progress.
             $progress = $this->get_course_progress($course, $childid);
 
@@ -115,7 +127,11 @@ class renderer extends plugin_renderer_base {
             $coursedata[] = [
                 'id' => $course->id,
                 'fullname' => format_string($course->fullname, true, ['context' => $coursecontext]),
+                'viewurl' => $courseurl->out(false),
                 'url' => $courseurl->out(false),
+                'courseimage' => $courseimage,
+                'coursecategory' => $coursecategory,
+                'hasprogress' => $progress['percentage'] !== null,
                 'progress' => $progress['percentage'],
                 'progresstext' => $progress['text'],
                 'progressclass' => $progress['class'],
@@ -135,10 +151,45 @@ class renderer extends plugin_renderer_base {
                 'hasgradeslist' => !empty($gradeslist),
                 'finalgrade' => $gradeinfo['grade'],
                 'finalgradetext' => $gradeinfo['text'],
+                'uniqid' => uniqid(),
             ];
         }
 
         return $coursedata;
+    }
+
+    /**
+     * Get course image URL.
+     *
+     * @param object $course Course object
+     * @return string Course image URL
+     */
+    private function get_course_image($course) {
+        global $CFG, $OUTPUT;
+
+        require_once($CFG->libdir . '/filelib.php');
+
+        $coursecontext = \context_course::instance($course->id);
+        
+        // Try to get course overview files.
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($coursecontext->id, 'course', 'overviewfiles', false, 'filename', false);
+        
+        if (count($files)) {
+            $file = reset($files);
+            $url = \moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                null,
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+            return $url->out();
+        }
+
+        // Return default course image.
+        return $OUTPUT->get_generated_image_for_id($course->id);
     }
 
     /**
@@ -227,11 +278,8 @@ class renderer extends plugin_renderer_base {
 
         $gradetext = grade_format_gradevalue($finalgrade, $gradeitem, true, GRADE_DISPLAY_TYPE_REAL);
 
-        // Determine grade class based on percentage.
-        $percentage = 0;
-        if ($gradeitem->grademax > 0) {
-            $percentage = ($finalgrade / $gradeitem->grademax) * 100;
-        }
+        // Calculate percentage based only on graded activities (excluding N/A).
+        $percentage = $this->calculate_grade_percentage($course, $userid);
 
         $class = 'bg-danger';
         if ($percentage >= 70) {
@@ -248,6 +296,49 @@ class renderer extends plugin_renderer_base {
             'percentage' => round($percentage, 1),
             'hasgrade' => true,
         ];
+    }
+
+    /**
+     * Calculate grade percentage excluding N/A activities.
+     *
+     * @param object $course Course object
+     * @param int $userid User ID
+     * @return float Grade percentage
+     */
+    private function calculate_grade_percentage($course, $userid) {
+        $modinfo = get_fast_modinfo($course, $userid);
+        $totalpoints = 0;
+        $earnedpoints = 0;
+
+        foreach ($modinfo->get_cms() as $cm) {
+            if (!$cm->uservisible) {
+                continue;
+            }
+
+            $gradeitem = grade_item::fetch([
+                'itemtype' => 'mod',
+                'itemmodule' => $cm->modname,
+                'iteminstance' => $cm->instance,
+                'courseid' => $course->id,
+            ]);
+
+            if ($gradeitem && $gradeitem->gradetype == GRADE_TYPE_VALUE) {
+                $grade = new grade_grade(['itemid' => $gradeitem->id, 'userid' => $userid]);
+                $grade->grade_item = $gradeitem;
+
+                // Only include graded activities (not N/A).
+                if ($grade->finalgrade !== null && $grade->finalgrade !== false) {
+                    $totalpoints += $gradeitem->grademax;
+                    $earnedpoints += $grade->finalgrade;
+                }
+            }
+        }
+
+        if ($totalpoints > 0) {
+            return ($earnedpoints / $totalpoints) * 100;
+        }
+
+        return 0;
     }
 
     /**
@@ -313,6 +404,8 @@ class renderer extends plugin_renderer_base {
      * @return array Activity list
      */
     private function get_activity_list($course, $userid) {
+        global $OUTPUT;
+        
         $completion = new completion_info($course);
         $activities = [];
 
@@ -332,9 +425,14 @@ class renderer extends plugin_renderer_base {
                 $iscompleted = ($completiondata->completionstate == COMPLETION_COMPLETE ||
                     $completiondata->completionstate == COMPLETION_COMPLETE_PASS);
 
+                // Get module icon.
+                $iconurl = $cm->get_icon_url()->out(false);
+
                 $activities[] = [
                     'name' => format_string($cm->name, true, ['context' => $cm->context]),
                     'type' => get_string('modulename', $cm->modname),
+                    'modname' => $cm->modname,
+                    'iconurl' => $iconurl,
                     'completed' => $iscompleted,
                     'completedtext' => $iscompleted ? 
                         get_string('completed', 'block_customdashboard') : 

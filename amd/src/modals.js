@@ -24,8 +24,9 @@
 define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], function($, ModalFactory, ModalEvents, Str) {
     return {
         init: function() {
-            // View Activities button handler
-            $('.view-activities').on('click', function() {
+            // Use event delegation to handle dynamically loaded content
+            $(document).on('click', '.view-activities, .view-activities-link', function(e) {
+                e.preventDefault();
                 const courseId = $(this).data('courseid');
                 const courseName = $(this).data('coursename');
                 const activityData = $('.activity-data[data-courseid="' + courseId + '"]');
@@ -50,11 +51,13 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                         activityData.find('.activity-item').each(function() {
                             const name = $(this).data('name');
                             const type = $(this).data('type');
+                            const iconUrl = $(this).data('iconurl');
                             const completedText = $(this).data('completedtext');
                             const completedClass = $(this).data('completedclass');
 
                             activitiesHtml += '<tr>' +
-                                '<td>' + name + '</td>' +
+                                '<td><img src="' + iconUrl +
+                                '" class="icon" alt="" style="width:16px;height:16px;margin-right:8px;"> ' + name + '</td>' +
                                 '<td class="text-center">' + type + '</td>' +
                                 '<td class="text-center"><span class="badge ' + completedClass + '">'
                                 + completedText + '</span></td>' +
@@ -87,11 +90,13 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                         activityData.find('.activity-item').each(function() {
                             const name = $(this).data('name');
                             const type = $(this).data('type');
+                            const iconUrl = $(this).data('iconurl');
                             const completedText = $(this).data('completedtext');
                             const completedClass = $(this).data('completedclass');
 
                             activitiesHtml += '<tr>' +
-                                '<td>' + name + '</td>' +
+                                '<td><img src="' + iconUrl +
+                                '" class="icon" alt="" style="width:16px;height:16px;margin-right:8px;"> ' + name + '</td>' +
                                 '<td class="text-center">' + type + '</td>' +
                                 '<td class="text-center"><span class="badge ' + completedClass + '">'
                                 + completedText + '</span></td>' +
@@ -113,8 +118,9 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                 });
             });
 
-            // View Grades button handler
-            $('.view-grades').on('click', function() {
+            // View Grades button handler - use event delegation
+            $(document).on('click', '.view-grades, .view-grades-link', function(e) {
+                e.preventDefault();
                 const courseId = $(this).data('courseid');
                 const courseName = $(this).data('coursename');
                 const gradesData = $('.grades-data[data-courseid="' + courseId + '"]');

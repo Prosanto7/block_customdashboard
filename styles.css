@@ -15,71 +15,128 @@
     margin-top: 15px;
 }
 
-.block-customdashboard .course-card .card-body {
-    background-color: #F4F5F6;
-    border-radius: 10px;
-    transition: box-shadow 0.3s ease;
+/* Course Card Styles - Matching myoverview */
+.block-customdashboard .course-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .block-customdashboard .course-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.block-customdashboard .course-card .card-title {
-    font-size: 1.1rem;
+.block-customdashboard .course-card .card-img-top {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-color: #e9ecef;
+}
+
+.block-customdashboard .course-card .course-info-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.block-customdashboard .course-card .coursename {
     font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.block-customdashboard .course-card .card-title a {
+    font-size: 1rem;
     color: #0f6cbf;
     text-decoration: none;
+    display: block;
 }
 
-.block-customdashboard .course-card .card-title a:hover {
+.block-customdashboard .course-card .coursename:hover {
     text-decoration: underline;
 }
 
-.block-customdashboard .course-info {
-    font-size: 0.9rem;
-}
-
-.block-customdashboard .info-item {
-    padding: 8px 0;
-}
-
-.block-customdashboard .info-item strong {
+.block-customdashboard .course-card .multiline {
     display: block;
-    margin-bottom: 5px;
-    color: #495057;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.block-customdashboard .progress {
-    background-color: rgb(37 161 142 / .16) !important;
-    border-radius: 999px;
+/* Progress Bar Styles */
+.block-customdashboard .card-footer {
+    background-color: transparent;
+    padding: 0.5rem 1rem;
 }
 
-.block-customdashboard .progress-bar {
-    background-color: #25a18e;
-    background-image: linear-gradient(to right, #25a18e 0%, #005eb8 100%);
-    border-radius: 999px;
+.block-customdashboard .progress-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: left;
 }
 
-.block-customdashboard .badge {
-    font-size: 0.95rem;
-    font-weight: 500;
+/* Course Action Menu */
+.block-customdashboard .coursemenubtn {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: #6c757d;
 }
 
+.block-customdashboard .coursemenubtn:hover {
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.block-customdashboard .dropdown-menu {
+    min-width: 200px;
+}
+
+.block-customdashboard .dropdown-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.block-customdashboard .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.block-customdashboard .dropdown-item i {
+    width: 20px;
+}
+
+/* Card Grid Layout */
+.block-customdashboard .card-grid {
+    gap: 1rem;
+}
+
+.block-customdashboard .card-grid .col {
+    padding: 0 0.5rem;
+}
+
+/* Alert Styles */
 .block-customdashboard .alert {
     margin-top: 15px;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
-    .block-customdashboard .course-card .card-title {
-        font-size: 1rem;
+    .block-customdashboard .course-card .card-img-top {
+        height: 150px;
     }
     
-    .block-customdashboard .course-info {
-        font-size: 0.85rem;
+    .block-customdashboard .course-card .coursename {
+        font-size: 0.95rem;
     }
 }
+
+@media (max-width: 576px) {
+    .block-customdashboard .card-grid .col {
+        padding: 0;
+    }
+    
+    .block-customdashboard .course-card {
+        margin-bottom: 1rem;
+    }
+}
+
