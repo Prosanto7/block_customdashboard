@@ -35,7 +35,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                     {key: 'activityname', component: 'block_customdashboard'},
                     {key: 'activitytype', component: 'block_customdashboard'},
                     {key: 'status', component: 'block_customdashboard'},
-                    {key: 'nocourses', component: 'block_customdashboard'},
+                    {key: 'nocourseactivities', component: 'block_customdashboard'},
                     {key: 'activitiesfor', component: 'block_customdashboard', param: courseName}
                 ];
 
@@ -125,7 +125,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/str'], functi
                     {key: 'grade', component: 'block_customdashboard'},
                     {key: 'na', component: 'block_customdashboard'},
                     {key: 'finalgrade', component: 'block_customdashboard'},
-                    {key: 'nocourses', component: 'block_customdashboard'},
+                    {key: 'nogrades', component: 'block_customdashboard'},
                     {key: 'gradesfor', component: 'block_customdashboard', param: courseName}
                 ];
 

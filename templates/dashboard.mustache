@@ -60,11 +60,11 @@
                                         
                                     </div>
                                 </div>
-                                <small class="text-muted">{{progresstext}}</small>
+                                <small>{{progresstext}}</small>
                             </div>
 
                             {{#hasgrade}}
-                            <div class="info-item mb-3">
+                            <div class="info-item">
                                 <div class="border rounded">
                                     <!-- Header -->
                                     <div class="d-flex text-center bg-light font-weight-bold">
@@ -99,13 +99,11 @@
                                             data-coursename="{{fullname}}">
                                         <i class="fa fa-list"></i> {{#str}}viewactivities, block_customdashboard{{/str}}
                                     </button>
-                                    {{#hasgrade}}
                                     <button type="button" class="btn btn-info btn-sm view-grades" 
                                             data-courseid="{{id}}" 
                                             data-coursename="{{fullname}}">
                                         <i class="fa fa-chart-bar"></i> {{#str}}viewgrades, block_customdashboard{{/str}}
                                     </button>
-                                    {{/hasgrade}}
                                 </div>
                             </div>
                         </div>
