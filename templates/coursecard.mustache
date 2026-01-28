@@ -49,16 +49,24 @@
                         </span>
                     </span>
                 </a>
-                <div class="text-muted muted d-flex flex-wrap">
+                <div class="mt-2">
                     {{#coursecategory}}
-                        <span class="visually-hidden">
-                            {{#str}}aria:coursecategory, core_course{{/str}}
-                        </span>
-                        <span class="categoryname text-truncate">
-                            {{#pix}}i/course, core{{/pix}}
+                        <span class="small text-truncate">
+                            {{#pix}}i/folder, core{{/pix}}
                             {{{coursecategory}}}
                         </span>
                     {{/coursecategory}}
+                </div>
+                <div>
+                    <span class="small">
+                        {{#pix}}i/course, core{{/pix}}
+                        {{#hasinstructor}}
+                            {{#instructors}}{{fullname}}{{/instructors}}
+                        {{/hasinstructor}}
+                        {{^hasinstructor}}
+                            {{#str}}instructornotassigned, block_customdashboard{{/str}}
+                        {{/hasinstructor}}
+                    </span>
                 </div>
             </div>
         </div>
@@ -104,8 +112,19 @@
         </div>
     </div>
     {{#hasprogress}}
-        <div class="card-footer border-0 bg-white w-100">
-            {{> block_customdashboard/progress-bar}}
+        <div class="card-footer border-0 bg-white w-100 pt-2 mb-2">
+            <div class="mb-1 d-flex justify-content-between align-items-center">
+                <small>{{progresstext}}</small>
+                <small>{{progress}}%</small>
+            </div>
+            <div class="progress-area" style="height: 8px;">
+                <div class="progress-bar" role="progressbar" 
+                     style="width: {{progress}}%" 
+                     aria-valuenow="{{progress}}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
         </div>
     {{/hasprogress}}
 </div>

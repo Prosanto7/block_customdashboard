@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * JavaScript for child selector in Custom Dashboard block.
+ * JavaScript for child selector and zoom filter in Custom Dashboard block.
  *
  * @module     block_customdashboard/selector
  * @copyright  2026
@@ -24,11 +24,53 @@
 define(['jquery'], function($) {
     return {
         init: function() {
+            // Child selector for parents.
             $('#child-selector').on('change', function() {
                 const selectedChildId = $(this).val();
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.set('selectedchild', selectedChildId);
                 window.location.href = currentUrl.toString();
+            });
+
+            // Zoom filter for students and teachers.
+            $('#zoom-filter').on('change', function() {
+                const filterValue = $(this).val();
+                const container = $('#zoom-classes-container');
+                const items = container.find('.zoom-class-item');
+
+                if (filterValue === 'today') {
+                    items.each(function() {
+                        if ($(this).data('filter') === 'today') {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                } else if (filterValue === 'upcoming') {
+                    items.each(function() {
+                        if ($(this).data('filter') === 'upcoming') {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                }
+
+                // Check if there are visible items.
+                const visibleItems = items.filter(':visible').length;
+                const listGroup = container.find('.list-group');
+
+                // First, remove any existing no-data message.
+                container.find('.no-data-message').remove();
+
+                if (visibleItems === 0) {
+                    listGroup.hide();
+                    listGroup.after(
+                        '<p class="text-muted no-data-message">No zoom classes found.</p>'
+                    );
+                } else {
+                    listGroup.show();
+                }
             });
         }
     };

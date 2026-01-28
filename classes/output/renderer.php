@@ -37,13 +37,13 @@ use grade_item;
 class renderer extends plugin_renderer_base {
 
     /**
-     * Render the dashboard content.
+     * Render the parent dashboard content.
      *
      * @param array $children Array of child users
      * @param int $selectedchildid Selected child ID
      * @return string HTML content
      */
-    public function render_dashboard($children, $selectedchildid) {
+    public function render_parent_dashboard($children, $selectedchildid) {
         global $DB, $PAGE;
 
         // Prepare children for selector.
@@ -64,11 +64,55 @@ class renderer extends plugin_renderer_base {
             'haschildren' => !empty($childrenoptions),
             'courses' => $courses,
             'hascourses' => !empty($courses),
+            'isparent' => true,
+            'zoomclasses' => $this->get_zoom_classes($selectedchildid, 'student'),
+            'teachers' => $this->get_student_teachers($selectedchildid),
         ];
 
         // Initialize JavaScript module.
         $PAGE->requires->js_call_amd('block_customdashboard/selector', 'init');
         $PAGE->requires->js_call_amd('block_customdashboard/modals', 'init');
+
+        return $this->render_from_template('block_customdashboard/dashboard', $data);
+    }
+
+    /**
+     * Render student dashboard.
+     *
+     * @param int $userid Student user ID
+     * @return string HTML content
+     */
+    public function render_student_dashboard($userid) {
+        global $PAGE;
+
+        $data = [
+            'isstudent' => true,
+            'zoomclasses' => $this->get_zoom_classes($userid, 'student'),
+            'teachers' => $this->get_student_teachers($userid),
+        ];
+
+        // Initialize JavaScript module.
+        $PAGE->requires->js_call_amd('block_customdashboard/selector', 'init');
+
+        return $this->render_from_template('block_customdashboard/dashboard', $data);
+    }
+
+    /**
+     * Render teacher dashboard.
+     *
+     * @param int $userid Teacher user ID
+     * @return string HTML content
+     */
+    public function render_teacher_dashboard($userid) {
+        global $PAGE;
+
+        $data = [
+            'isteacher' => true,
+            'zoomclasses' => $this->get_zoom_classes($userid, 'teacher'),
+        ];
+
+        // Initialize JavaScript module.
+        $PAGE->requires->js_call_amd('block_customdashboard/selector', 'init');
 
         return $this->render_from_template('block_customdashboard/dashboard', $data);
     }
@@ -124,6 +168,9 @@ class renderer extends plugin_renderer_base {
             // Get grades list.
             $gradeslist = $this->get_grades_list($course, $childid);
 
+            // Get course instructors (teachers).
+            $instructors = $this->get_course_instructors($course->id);
+
             $coursedata[] = [
                 'id' => $course->id,
                 'fullname' => format_string($course->fullname, true, ['context' => $coursecontext]),
@@ -152,6 +199,8 @@ class renderer extends plugin_renderer_base {
                 'finalgrade' => $gradeinfo['grade'],
                 'finalgradetext' => $gradeinfo['text'],
                 'uniqid' => uniqid(),
+                'instructors' => $instructors,
+                'hasinstructor' => !empty($instructors),
             ];
         }
 
@@ -522,5 +571,205 @@ class renderer extends plugin_renderer_base {
         }
 
         return $gradeslist;
+    }
+
+    /**
+     * Get course instructors (teachers).
+     *
+     * @param int $courseid Course ID
+     * @return array Instructors list
+     */
+    private function get_course_instructors($courseid) {
+        global $DB, $OUTPUT;
+
+        $coursecontext = \context_course::instance($courseid);
+        
+        // Get teacher and editing teacher roles.
+        $teacherroles = $DB->get_records_sql(
+            "SELECT id FROM {role} WHERE archetype IN ('editingteacher', 'teacher')"
+        );
+
+        if (empty($teacherroles)) {
+            return [];
+        }
+
+        $roleids = array_keys($teacherroles);
+        list($insql, $params) = $DB->get_in_or_equal($roleids);
+        $params[] = $coursecontext->id;
+
+        $instructors = $DB->get_records_sql(
+            "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.picture, u.imagealt, u.firstnamephonetic,
+                    u.lastnamephonetic, u.middlename, u.alternatename
+             FROM {user} u
+             JOIN {role_assignments} ra ON ra.userid = u.id
+             WHERE ra.roleid $insql AND ra.contextid = ?
+             ORDER BY u.lastname, u.firstname
+             LIMIT 1",
+            $params
+        );
+
+        $instructordata = [];
+        foreach ($instructors as $instructor) {
+            $instructordata[] = [
+                'id' => $instructor->id,
+                'fullname' => fullname($instructor),
+            ];
+        }
+
+        return $instructordata;
+    }
+
+    /**
+     * Get zoom classes for a user.
+     *
+     * @param int $userid User ID
+     * @param string $role User role (student or teacher)
+     * @return array Zoom classes data
+     */
+    private function get_zoom_classes($userid, $role) {
+        global $DB, $CFG;
+
+        // Check if zoom module exists.
+        if (!$DB->record_exists('modules', ['name' => 'zoom', 'visible' => 1])) {
+            return ['items' => [], 'hasitems' => false];
+        }
+
+        $now = time();
+        $todaystart = strtotime('today', $now);
+        $todayend = strtotime('tomorrow', $now) - 1;
+
+        // Get enrolled courses based on role.
+        $courses = enrol_get_users_courses($userid, true);
+        
+        if (empty($courses)) {
+            return ['items' => [], 'hasitems' => false, 'filter' => 'today'];
+        }
+
+        $courseids = array_keys($courses);
+
+        // If teacher, filter courses where user has teacher/manager role.
+        if ($role === 'teacher') {
+            $filteredcourses = [];
+            foreach ($courses as $course) {
+                $coursecontext = \context_course::instance($course->id);
+                if (has_capability('mod/zoom:addinstance', $coursecontext, $userid)) {
+                    $filteredcourses[] = $course->id;
+                }
+            }
+            $courseids = $filteredcourses;
+        }
+
+        if (empty($courseids)) {
+            return ['items' => [], 'hasitems' => false, 'filter' => 'today'];
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($courseids);
+        
+        // Get all zoom meetings from today onwards (both today and upcoming).
+        $params[] = $todaystart;
+
+        $sql = "SELECT z.id, z.name, z.start_time, z.duration, z.join_url, z.course, c.fullname as coursename
+                FROM {zoom} z
+                JOIN {course} c ON z.course = c.id
+                WHERE z.course $insql 
+                AND z.start_time >= ?
+                AND z.exists_on_zoom = 1
+                ORDER BY z.start_time ASC";
+
+        $meetings = $DB->get_records_sql($sql, $params);
+
+        $items = [];
+        foreach ($meetings as $meeting) {
+            $istoday = ($meeting->start_time >= $todaystart && $meeting->start_time <= $todayend);
+            $isupcoming = ($meeting->start_time > $todayend);
+            
+            $items[] = [
+                'id' => $meeting->id,
+                'name' => format_string($meeting->name),
+                'coursename' => format_string($meeting->coursename),
+                'starttime' => userdate($meeting->start_time, get_string('strftimedatetime', 'langconfig')),
+                'starttimestamp' => $meeting->start_time,
+                'duration' => $meeting->duration,
+                'joinurl' => $meeting->join_url,
+                'istoday' => $istoday,
+                'isupcoming' => $isupcoming,
+            ];
+        }
+
+        return [
+            'items' => $items,
+            'hasitems' => !empty($items),
+            'filter' => 'today',
+            'showfilter' => true,
+        ];
+    }
+
+    /**
+     * Get teachers for courses where student is enrolled.
+     *
+     * @param int $studentid Student user ID
+     * @return array Teachers data
+     */
+    private function get_student_teachers($studentid) {
+        global $DB, $OUTPUT;
+
+        $courses = enrol_get_users_courses($studentid, true);
+        
+        if (empty($courses)) {
+            return ['items' => [], 'hasitems' => false];
+        }
+
+        $teachersdata = [];
+        $uniqueteachers = [];
+
+        foreach ($courses as $course) {
+            $coursecontext = \context_course::instance($course->id);
+            
+            // Get teacher and editing teacher roles.
+            $teacherroles = $DB->get_records_sql(
+                "SELECT id FROM {role} WHERE archetype IN ('editingteacher', 'teacher')"
+            );
+
+            if (empty($teacherroles)) {
+                continue;
+            }
+
+            $roleids = array_keys($teacherroles);
+            list($insql, $params) = $DB->get_in_or_equal($roleids);
+            $params[] = $coursecontext->id;
+
+            $teachers = $DB->get_records_sql(
+                "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.picture, u.imagealt,
+                        u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename
+                 FROM {user} u
+                 JOIN {role_assignments} ra ON ra.userid = u.id
+                 WHERE ra.roleid $insql AND ra.contextid = ?
+                 ORDER BY u.lastname, u.firstname",
+                $params
+            );
+
+            foreach ($teachers as $teacher) {
+                if (!isset($uniqueteachers[$teacher->id])) {
+                    $uniqueteachers[$teacher->id] = [
+                        'id' => $teacher->id,
+                        'fullname' => fullname($teacher),
+                        'email' => $teacher->email,
+                        'picture' => $OUTPUT->user_picture($teacher, ['size' => 50, 'link' => false]),
+                        'courses' => [],
+                    ];
+                }
+                $uniqueteachers[$teacher->id]['courses'][] = format_string($course->fullname);
+            }
+        }
+
+        foreach ($uniqueteachers as $teacher) {
+            $teacher['courseslist'] = implode(', ', $teacher['courses']);
+            $teachersdata[] = $teacher;
+        }
+
+        return [
+            'items' => $teachersdata,
+            'hasitems' => !empty($teachersdata),
+        ];
     }
 }

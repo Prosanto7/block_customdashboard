@@ -84,15 +84,114 @@ class block_customdashboard extends block_base {
         $this->content->text = '';
         $this->content->footer = '';
 
+        // Check if user is admin - don't show block for admins.
+        $systemcontext = \context_system::instance();
+        if (is_siteadmin() || has_capability('moodle/site:config', $systemcontext)) {
+            return $this->content;
+        }
+
+        // Get renderer.
+        $renderer = $PAGE->get_renderer('block_customdashboard');
+
+        // Determine user role and render appropriate content.
+        $userrole = $this->get_user_role();
+
+        switch ($userrole) {
+            case 'parent':
+                $this->content->text = $this->render_parent_dashboard($renderer);
+                break;
+            case 'student':
+                $this->content->text = $renderer->render_student_dashboard($USER->id);
+                break;
+            case 'teacher':
+                $this->content->text = $renderer->render_teacher_dashboard($USER->id);
+                break;
+            default:
+                // No content for other roles.
+                break;
+        }
+
+        return $this->content;
+    }
+
+    /**
+     * Determine the user's primary role.
+     *
+     * @return string Role (parent, student, teacher, or other)
+     */
+    private function get_user_role() {
+        global $USER, $DB;
+
+        // Check if user is a parent (has children).
+        $children = local_parentmanager_get_children($USER->id);
+        if (!empty($children)) {
+            return 'parent';
+        }
+
+        // Check if user has teacher or manager role in any course.
+        $systemcontext = \context_system::instance();
+        
+        // Get teacher and manager roles.
+        $teacherroles = $DB->get_records_sql(
+            "SELECT id FROM {role} WHERE archetype IN ('editingteacher', 'teacher', 'manager')"
+        );
+        
+        if (!empty($teacherroles)) {
+            $roleids = array_keys($teacherroles);
+            list($insql, $params) = $DB->get_in_or_equal($roleids);
+            $params[] = $USER->id;
+            
+            $hasteacherrole = $DB->record_exists_sql(
+                "SELECT 1 FROM {role_assignments} ra
+                 JOIN {context} ctx ON ra.contextid = ctx.id
+                 WHERE ra.roleid $insql AND ra.userid = ? AND ctx.contextlevel = ?",
+                array_merge($params, [CONTEXT_COURSE])
+            );
+            
+            if ($hasteacherrole) {
+                return 'teacher';
+            }
+        }
+
+        // Check if user has student role in any course.
+        $studentroles = $DB->get_records('role', ['archetype' => 'student']);
+        if (!empty($studentroles)) {
+            $roleids = array_keys($studentroles);
+            list($insql, $params) = $DB->get_in_or_equal($roleids);
+            $params[] = $USER->id;
+            
+            $hasstudentrole = $DB->record_exists_sql(
+                "SELECT 1 FROM {role_assignments} ra
+                 JOIN {context} ctx ON ra.contextid = ctx.id
+                 WHERE ra.roleid $insql AND ra.userid = ? AND ctx.contextlevel = ?",
+                array_merge($params, [CONTEXT_COURSE])
+            );
+            
+            if ($hasstudentrole) {
+                return 'student';
+            }
+        }
+
+        return 'other';
+    }
+
+    /**
+     * Render parent dashboard.
+     *
+     * @param object $renderer Renderer instance
+     * @return string HTML content
+     */
+    private function render_parent_dashboard($renderer) {
+        global $USER;
+
         // Get children for the current user.
         $children = local_parentmanager_get_children($USER->id);
 
         if (empty($children)) {
-            $this->content->text = html_writer::div(
+            return html_writer::div(
                 get_string('nochildrenassigned', 'block_customdashboard'),
                 'alert alert-info'
             );
-            return $this->content;
         }
 
         // Get selected child from session or use first child.
@@ -109,10 +208,6 @@ class block_customdashboard extends block_base {
             }
         }
 
-        // Get renderer.
-        $renderer = $PAGE->get_renderer('block_customdashboard');
-        $this->content->text = $renderer->render_dashboard($children, $selectedchildid);
-
-        return $this->content;
+        return $renderer->render_parent_dashboard($children, $selectedchildid);
     }
 }

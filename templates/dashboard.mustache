@@ -20,13 +20,14 @@
     Custom Dashboard block template.
 
     Context variables required for this template:
-    * children - Array of child users
-    * haschildren - Boolean if there are children
-    * courses - Array of courses
-    * hascourses - Boolean if there are courses
+    * isparent - Boolean if user is parent
+    * isstudent - Boolean if user is student
+    * isteacher - Boolean if user is teacher
 }}
 
 <div class="block-customdashboard">
+    {{#isparent}}
+    {{! Parent Dashboard }}
     {{#haschildren}}
     <div class="child-selector-wrapper mb-3 d-flex align-items-center gap-3">
         <label for="child-selector" class="form-label">{{#str}}selectchild, block_customdashboard{{/str}}</label>
@@ -35,6 +36,89 @@
             <option value="{{id}}" {{#selected}}selected{{/selected}}>{{fullname}}</option>
             {{/children}}
         </select>
+    </div>
+
+    {{! Zoom classes and Teachers sections for selected child }}
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{#str}}zoomclasses, block_customdashboard{{/str}}</h5>
+                    {{#zoomclasses.showfilter}}
+                    <select id="zoom-filter" class="form-select form-select-sm" style="width: auto;">
+                        <option value="today" selected>{{#str}}today, block_customdashboard{{/str}}</option>
+                        <option value="upcoming">{{#str}}upcoming, block_customdashboard{{/str}}</option>
+                    </select>
+                    {{/zoomclasses.showfilter}}
+                </div>
+                <div class="card-body" id="zoom-classes-container">
+                    {{#zoomclasses.hasitems}}
+                    <div class="list-group">
+                        {{#zoomclasses.items}}
+                        <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                             data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{name}}</h6>
+                                    <p class="mb-1 text-muted small">
+                                        {{#pix}}i/course, core{{/pix}} {{coursename}}
+                                    </p>
+                                    <p class="mb-1 small">
+                                        {{#pix}}i/calendar, core{{/pix}} {{starttime}}
+                                    </p>
+                                    <p class="mb-0 small text-muted">
+                                        {{#str}}duration, block_customdashboard{{/str}}: {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                                    </p>
+                                </div>
+                                <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">
+                                    {{#str}}join, block_customdashboard{{/str}}
+                                </a>
+                            </div>
+                        </div>
+                        {{/zoomclasses.items}}
+                    </div>
+                    {{/zoomclasses.hasitems}}
+                    {{^zoomclasses.hasitems}}
+                    <p class="text-muted">{{#str}}nozoomclasses, block_customdashboard{{/str}}</p>
+                    {{/zoomclasses.hasitems}}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">{{#str}}teachers, block_customdashboard{{/str}}</h5>
+                </div>
+                <div class="card-body">
+                    {{#teachers.hasitems}}
+                    <div class="list-group">
+                        {{#teachers.items}}
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {{{picture}}}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{fullname}}</h6>
+                                    <p class="mb-1 small text-muted">
+                                        {{#pix}}t/email, core{{/pix}} {{email}}
+                                    </p>
+                                    <p class="mb-0 small text-muted">
+                                        {{#str}}courses, block_customdashboard{{/str}}: {{courseslist}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {{/teachers.items}}
+                    </div>
+                    {{/teachers.hasitems}}
+                    {{^teachers.hasitems}}
+                    <p class="text-muted">{{#str}}noteachers, block_customdashboard{{/str}}</p>
+                    {{/teachers.hasitems}}
+                </div>
+            </div>
+        </div>
     </div>
 
     {{#hascourses}}
@@ -50,4 +134,140 @@
     {{/hascourses}}
 
     {{/haschildren}}
+    {{/isparent}}
+
+    {{#isstudent}}
+    {{! Student Dashboard }}
+    <div class="student-dashboard">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{#str}}zoomclasses, block_customdashboard{{/str}}</h5>
+                        {{#zoomclasses.showfilter}}
+                        <select id="zoom-filter" class="form-select form-select-sm" style="width: auto;">
+                            <option value="today" selected>{{#str}}today, block_customdashboard{{/str}}</option>
+                            <option value="upcoming">{{#str}}upcoming, block_customdashboard{{/str}}</option>
+                        </select>
+                        {{/zoomclasses.showfilter}}
+                    </div>
+                    <div class="card-body" id="zoom-classes-container">
+                        {{#zoomclasses.hasitems}}
+                        <div class="list-group">
+                            {{#zoomclasses.items}}
+                            <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                                 data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{name}}</h6>
+                                        <p class="mb-1 text-muted small">
+                                            {{#pix}}i/course, core{{/pix}} {{coursename}}
+                                        </p>
+                                        <p class="mb-1 small">
+                                            {{#pix}}i/calendar, core{{/pix}} {{starttime}}
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            {{#str}}duration, block_customdashboard{{/str}}: {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                                        </p>
+                                    </div>
+                                    <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">
+                                        {{#str}}join, block_customdashboard{{/str}}
+                                    </a>
+                                </div>
+                            </div>
+                            {{/zoomclasses.items}}
+                        </div>
+                        {{/zoomclasses.hasitems}}
+                        {{^zoomclasses.hasitems}}
+                        <p class="text-muted">{{#str}}nozoomclasses, block_customdashboard{{/str}}</p>
+                        {{/zoomclasses.hasitems}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{#str}}teachers, block_customdashboard{{/str}}</h5>
+                    </div>
+                    <div class="card-body">
+                        {{#teachers.hasitems}}
+                        <div class="list-group">
+                            {{#teachers.items}}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        {{{picture}}}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{fullname}}</h6>
+                                        <p class="mb-1 small text-muted">
+                                            {{#pix}}t/email, core{{/pix}} {{email}}
+                                        </p>
+                                        <p class="mb-0 small text-muted">
+                                            {{#str}}courses, block_customdashboard{{/str}}: {{courseslist}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/teachers.items}}
+                        </div>
+                        {{/teachers.hasitems}}
+                        {{^teachers.hasitems}}
+                        <p class="text-muted">{{#str}}noteachers, block_customdashboard{{/str}}</p>
+                        {{/teachers.hasitems}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/isstudent}}
+
+    {{#isteacher}}
+    {{! Teacher Dashboard }}
+    <div class="teacher-dashboard">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{#str}}zoomclasses, block_customdashboard{{/str}}</h5>
+                {{#zoomclasses.showfilter}}
+                <select id="zoom-filter" class="form-select form-select-sm" style="width: auto;">
+                    <option value="today" selected>{{#str}}today, block_customdashboard{{/str}}</option>
+                    <option value="upcoming">{{#str}}upcoming, block_customdashboard{{/str}}</option>
+                </select>
+                {{/zoomclasses.showfilter}}
+            </div>
+            <div class="card-body" id="zoom-classes-container">
+                {{#zoomclasses.hasitems}}
+                <div class="list-group">
+                    {{#zoomclasses.items}}
+                    <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                         data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{name}}</h6>
+                                <p class="mb-1 text-muted small">
+                                    {{#pix}}i/course, core{{/pix}} {{coursename}}
+                                </p>
+                                <p class="mb-1 small">
+                                    {{#pix}}i/calendar, core{{/pix}} {{starttime}}
+                                </p>
+                                <p class="mb-0 small text-muted">
+                                    {{#str}}duration, block_customdashboard{{/str}}: {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                                </p>
+                            </div>
+                            <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">
+                                {{#str}}startjoin, block_customdashboard{{/str}}
+                            </a>
+                        </div>
+                    </div>
+                    {{/zoomclasses.items}}
+                </div>
+                {{/zoomclasses.hasitems}}
+                {{^zoomclasses.hasitems}}
+                <p class="text-muted">{{#str}}nozoomclasses, block_customdashboard{{/str}}</p>
+                {{/zoomclasses.hasitems}}
+            </div>
+        </div>
+    </div>
+    {{/isteacher}}
 </div>
