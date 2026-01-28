@@ -25,15 +25,19 @@
 }}
 
 <div class="card mb-3">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">{{#str}}zoomclasses, block_customdashboard{{/str}}</h5>
+        <select id="zoom-filter" class="form-select form-select-sm" style="width: auto;">
+            <option value="today" selected>{{#str}}today, block_customdashboard{{/str}}</option>
+            <option value="upcoming">{{#str}}upcoming, block_customdashboard{{/str}}</option>
+        </select>
     </div>
     <div class="card-body zoom-classes-scrollable" id="zoom-classes-container">
         {{#zoomclasses.hasitems}}
         <div class="list-group">
             {{#zoomclasses.items}}
-            <div class="list-group-item zoom-class-item">
-                <div class="d-flex justify-content-between align-items-start">
+            <div class="list-group-item zoom-class-item" data-timestamp="{{starttimestamp}}">
+                <div class="d-flex justify-content-between align-items-center">
                     <div class="flex-grow-1">
                         <h6 class="mb-1">{{name}}</h6>
                         <p class="mb-1 small">
@@ -41,8 +45,9 @@
                         </p>
                         <p class="mb-1 small">
                             {{#pix}}i/calendar, core{{/pix}} {{starttime}} 
-                            {{#pix}}e/insert_time, core{{/pix}} 
-                            {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                        </p>
+                        <p class="mb-1 small">
+                            {{#pix}}e/insert_time, core{{/pix}}  {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
                         </p>
                     </div>
                     <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">

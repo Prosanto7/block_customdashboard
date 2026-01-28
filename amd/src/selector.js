@@ -31,6 +31,72 @@ define(['jquery'], function($) {
                 currentUrl.searchParams.set('selectedchild', selectedChildId);
                 window.location.href = currentUrl.toString();
             });
+
+            // Zoom classes filter.
+            $('#zoom-filter').on('change', function() {
+                const filterValue = $(this).val();
+                filterZoomClasses(filterValue);
+            });
+
+            /**
+             * Filter zoom classes based on selected option.
+             * @param {string} filter - The filter value ('today' or 'upcoming')
+             */
+            function filterZoomClasses(filter) {
+                const now = Math.floor(Date.now() / 1000);
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+                const todayStartTimestamp = Math.floor(todayStart.getTime() / 1000);
+                const todayEnd = new Date();
+                todayEnd.setHours(23, 59, 59, 999);
+                const todayEndTimestamp = Math.floor(todayEnd.getTime() / 1000);
+
+                const $items = $('.zoom-class-item');
+                let visibleCount = 0;
+
+                $items.each(function() {
+                    const $item = $(this);
+                    const timestamp = parseInt($item.data('timestamp'), 10);
+
+                    let show = false;
+                    if (filter === 'today') {
+                        // Show classes happening today.
+                        show = timestamp >= todayStartTimestamp && timestamp <= todayEndTimestamp;
+                    } else if (filter === 'upcoming') {
+                        // Show all classes from now onwards (including today's remaining classes).
+                        show = timestamp >= now;
+                    }
+
+                    if (show) {
+                        $item.show();
+                        visibleCount++;
+                    } else {
+                        $item.hide();
+                    }
+                });
+
+                // Show/hide no classes message.
+                const $container = $('#zoom-classes-container');
+                const $noClassesMsg = $container.find('.no-zoom-classes-message');
+
+                if (visibleCount === 0) {
+                    if ($noClassesMsg.length === 0) {
+                        $container.find('.list-group').after(
+                            '<p class="text-muted no-zoom-classes-message">No zoom classes found.</p>'
+                        );
+                    }
+                    $container.find('.list-group').hide();
+                } else {
+                    $noClassesMsg.remove();
+                    $container.find('.list-group').show();
+                }
+            }
+
+            // Initialize with default filter on page load.
+            if ($('#zoom-filter').length > 0) {
+                const defaultFilter = $('#zoom-filter').val();
+                filterZoomClasses(defaultFilter);
+            }
         }
     };
 });
