@@ -55,7 +55,7 @@
                     {{#zoomclasses.hasitems}}
                     <div class="list-group">
                         {{#zoomclasses.items}}
-                        <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                        <div class="list-group-item zoom-class-item" data-filter="{{filtertype}}"
                              data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
@@ -92,7 +92,7 @@
                 </div>
                 <div class="card-body">
                     {{#teachers.hasitems}}
-                    <div class="list-group">
+                    <div class="list-group teachers-list-container teachers-scrollable">
                         {{#teachers.items}}
                         <div class="list-group-item">
                             <div class="d-flex align-items-center">
@@ -101,10 +101,10 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{fullname}}</h6>
-                                    <p class="mb-1 small text-muted">
+                                    <p class="mb-1 small">
                                         {{#pix}}t/email, core{{/pix}} {{email}}
                                     </p>
-                                    <p class="mb-0 small text-muted">
+                                    <p class="mb-0 small">
                                         {{#str}}courses, block_customdashboard{{/str}}: {{courseslist}}
                                     </p>
                                 </div>
@@ -123,6 +123,7 @@
 
     {{#hascourses}}
     <div class="courses-container">
+        <h4 class="mb-3">{{#str}}childcourses, block_customdashboard{{/str}}</h4>
         {{> block_customdashboard/view-cards }}
     </div>
     {{/hascourses}}
@@ -155,7 +156,7 @@
                         {{#zoomclasses.hasitems}}
                         <div class="list-group">
                             {{#zoomclasses.items}}
-                            <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                            <div class="list-group-item zoom-class-item" data-filter="{{filtertype}}"
                                  data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div class="flex-grow-1">
@@ -192,7 +193,7 @@
                     </div>
                     <div class="card-body">
                         {{#teachers.hasitems}}
-                        <div class="list-group">
+                        <div class="list-group teachers-list-container {{#teachers.scrollable}}teachers-scrollable{{/teachers.scrollable}}">
                             {{#teachers.items}}
                             <div class="list-group-item">
                                 <div class="d-flex align-items-center">
@@ -201,10 +202,10 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">{{fullname}}</h6>
-                                        <p class="mb-1 small text-muted">
+                                        <p class="mb-1 small">
                                             {{#pix}}t/email, core{{/pix}} {{email}}
                                         </p>
-                                        <p class="mb-0 small text-muted">
+                                        <p class="mb-0 small">
                                             {{#str}}courses, block_customdashboard{{/str}}: {{courseslist}}
                                         </p>
                                     </div>
@@ -240,7 +241,7 @@
                 {{#zoomclasses.hasitems}}
                 <div class="list-group">
                     {{#zoomclasses.items}}
-                    <div class="list-group-item zoom-class-item" data-filter="{{#istoday}}today{{/istoday}}{{#isupcoming}}upcoming{{/isupcoming}}"
+                    <div class="list-group-item zoom-class-item" data-filter="{{filtertype}}"
                          data-timestamp="{{starttimestamp}}" style="{{#isupcoming}}display:none;{{/isupcoming}}">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">

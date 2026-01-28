@@ -38,23 +38,17 @@ define(['jquery'], function($) {
                 const container = $('#zoom-classes-container');
                 const items = container.find('.zoom-class-item');
 
-                if (filterValue === 'today') {
-                    items.each(function() {
-                        if ($(this).data('filter') === 'today') {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-                } else if (filterValue === 'upcoming') {
-                    items.each(function() {
-                        if ($(this).data('filter') === 'upcoming') {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-                }
+                // Show/hide items based on filter
+                items.each(function() {
+                    const itemFilter = $(this).attr('data-filter');
+                    if (filterValue === 'today' && itemFilter === 'today') {
+                        $(this).show();
+                    } else if (filterValue === 'upcoming' && itemFilter === 'upcoming') {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
 
                 // Check if there are visible items.
                 const visibleItems = items.filter(':visible').length;

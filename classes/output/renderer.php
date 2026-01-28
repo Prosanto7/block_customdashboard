@@ -693,6 +693,7 @@ class renderer extends plugin_renderer_base {
                 'joinurl' => $meeting->join_url,
                 'istoday' => $istoday,
                 'isupcoming' => $isupcoming,
+                'filtertype' => $istoday ? 'today' : 'upcoming',
             ];
         }
 
@@ -727,7 +728,7 @@ class renderer extends plugin_renderer_base {
             
             // Get teacher and editing teacher roles.
             $teacherroles = $DB->get_records_sql(
-                "SELECT id FROM {role} WHERE archetype IN ('editingteacher', 'teacher')"
+                "SELECT id FROM {role} WHERE archetype IN ('manager', 'editingteacher', 'teacher')"
             );
 
             if (empty($teacherroles)) {

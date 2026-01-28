@@ -66,3 +66,4 @@ $string['minutes'] = 'minutes';
 $string['courses'] = 'Courses';
 $string['instructor'] = 'Instructor';
 $string['instructornotassigned'] = 'Instructor Not Assigned';
+$string['childcourses'] = 'Child\'s Courses';

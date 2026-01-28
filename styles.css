@@ -130,6 +130,31 @@
     margin-top: 15px;
 }
 
+/* Teachers List Scrollable */
+.block-customdashboard .teachers-list-container.teachers-scrollable {
+    max-height: 170px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.block-customdashboard .teachers-list-container.teachers-scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.block-customdashboard .teachers-list-container.teachers-scrollable::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.block-customdashboard .teachers-list-container.teachers-scrollable::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.block-customdashboard .teachers-list-container.teachers-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .block-customdashboard .course-card .card-img-top {
