@@ -67,6 +67,7 @@ class renderer extends plugin_renderer_base {
             'isparent' => true,
             'zoomclasses' => $this->get_zoom_classes($selectedchildid, 'student'),
             'teachers' => $this->get_student_teachers($selectedchildid),
+            'buttonlabel' => 'join',
         ];
 
         // Initialize JavaScript module.
@@ -89,6 +90,7 @@ class renderer extends plugin_renderer_base {
             'isstudent' => true,
             'zoomclasses' => $this->get_zoom_classes($userid, 'student'),
             'teachers' => $this->get_student_teachers($userid),
+            'buttonlabel' => 'join',
         ];
 
         // Initialize JavaScript module.
@@ -109,6 +111,7 @@ class renderer extends plugin_renderer_base {
         $data = [
             'isteacher' => true,
             'zoomclasses' => $this->get_zoom_classes($userid, 'teacher'),
+            'buttonlabel' => 'startjoin',
         ];
 
         // Initialize JavaScript module.
@@ -636,13 +639,12 @@ class renderer extends plugin_renderer_base {
 
         $now = time();
         $todaystart = strtotime('today', $now);
-        $todayend = strtotime('tomorrow', $now) - 1;
 
         // Get enrolled courses based on role.
         $courses = enrol_get_users_courses($userid, true);
         
         if (empty($courses)) {
-            return ['items' => [], 'hasitems' => false, 'filter' => 'today'];
+            return ['items' => [], 'hasitems' => false];
         }
 
         $courseids = array_keys($courses);
@@ -660,48 +662,47 @@ class renderer extends plugin_renderer_base {
         }
 
         if (empty($courseids)) {
-            return ['items' => [], 'hasitems' => false, 'filter' => 'today'];
+            return ['items' => [], 'hasitems' => false];
         }
 
         list($insql, $params) = $DB->get_in_or_equal($courseids);
         
-        // Get all zoom meetings from today onwards (both today and upcoming).
+        // Get all zoom calendar events from today onwards.
+        // Zoom creates calendar events for each occurrence (including recurring meetings).
         $params[] = $todaystart;
+        
+        $sql = "SELECT e.id, e.name, e.timestart, e.instance as zoomid, e.courseid, c.fullname as coursename
+                FROM {event} e
+                JOIN {course} c ON e.courseid = c.id
+                WHERE e.modulename = 'zoom'
+                AND e.courseid $insql
+                AND e.timestart >= ?
+                AND e.visible = 1
+                ORDER BY e.timestart ASC";
 
-        $sql = "SELECT z.id, z.name, z.start_time, z.duration, z.join_url, z.course, c.fullname as coursename
-                FROM {zoom} z
-                JOIN {course} c ON z.course = c.id
-                WHERE z.course $insql 
-                AND z.start_time >= ?
-                AND z.exists_on_zoom = 1
-                ORDER BY z.start_time ASC";
-
-        $meetings = $DB->get_records_sql($sql, $params);
+        $events = $DB->get_records_sql($sql, $params);
 
         $items = [];
-        foreach ($meetings as $meeting) {
-            $istoday = ($meeting->start_time >= $todaystart && $meeting->start_time <= $todayend);
-            $isupcoming = ($meeting->start_time > $todayend);
+        foreach ($events as $event) {
+            // Get the zoom instance to fetch duration and join_url.
+            $zoom = $DB->get_record('zoom', ['id' => $event->zoomid], 'id, name, duration, join_url');
             
-            $items[] = [
-                'id' => $meeting->id,
-                'name' => format_string($meeting->name),
-                'coursename' => format_string($meeting->coursename),
-                'starttime' => userdate($meeting->start_time, get_string('strftimedatetime', 'langconfig')),
-                'starttimestamp' => $meeting->start_time,
-                'duration' => $meeting->duration,
-                'joinurl' => $meeting->join_url,
-                'istoday' => $istoday,
-                'isupcoming' => $isupcoming,
-                'filtertype' => $istoday ? 'today' : 'upcoming',
-            ];
+            if ($zoom) {
+                $items[] = [
+                    'id' => $zoom->id,
+                    'name' => format_string($event->name),
+                    'coursename' => format_string($event->coursename),
+                    'starttime' => userdate($event->timestart, get_string('strftimedatetime', 'langconfig')),
+                    'starttimestamp' => $event->timestart,
+                    'duration' => $zoom->duration / 60, // Convert minutes to hours
+                    'joinurl' => $zoom->join_url,
+                ];
+            }
         }
 
         return [
             'items' => $items,
             'hasitems' => !empty($items),
-            'filter' => 'today',
-            'showfilter' => true,
         ];
     }
 

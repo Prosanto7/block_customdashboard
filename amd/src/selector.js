@@ -31,41 +31,6 @@ define(['jquery'], function($) {
                 currentUrl.searchParams.set('selectedchild', selectedChildId);
                 window.location.href = currentUrl.toString();
             });
-
-            // Zoom filter for students and teachers.
-            $('#zoom-filter').on('change', function() {
-                const filterValue = $(this).val();
-                const container = $('#zoom-classes-container');
-                const items = container.find('.zoom-class-item');
-
-                // Show/hide items based on filter
-                items.each(function() {
-                    const itemFilter = $(this).attr('data-filter');
-                    if (filterValue === 'today' && itemFilter === 'today') {
-                        $(this).show();
-                    } else if (filterValue === 'upcoming' && itemFilter === 'upcoming') {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-
-                // Check if there are visible items.
-                const visibleItems = items.filter(':visible').length;
-                const listGroup = container.find('.list-group');
-
-                // First, remove any existing no-data message.
-                container.find('.no-data-message').remove();
-
-                if (visibleItems === 0) {
-                    listGroup.hide();
-                    listGroup.after(
-                        '<p class="text-muted no-data-message">No zoom classes found.</p>'
-                    );
-                } else {
-                    listGroup.show();
-                }
-            });
         }
     };
 });

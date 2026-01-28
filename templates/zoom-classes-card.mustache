@@ -1,0 +1,60 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_customdashboard/zoom-classes-card
+
+    Reusable Zoom Classes Card component.
+
+    Context variables required for this template:
+    * zoomclasses - Object with zoom classes data
+    * buttonlabel - String for the button label (join or startjoin)
+}}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">{{#str}}zoomclasses, block_customdashboard{{/str}}</h5>
+    </div>
+    <div class="card-body zoom-classes-scrollable" id="zoom-classes-container">
+        {{#zoomclasses.hasitems}}
+        <div class="list-group">
+            {{#zoomclasses.items}}
+            <div class="list-group-item zoom-class-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{name}}</h6>
+                        <p class="mb-1 small">
+                            {{#pix}}i/course, core{{/pix}} {{coursename}}
+                        </p>
+                        <p class="mb-1 small">
+                            {{#pix}}i/calendar, core{{/pix}} {{starttime}} 
+                            {{#pix}}e/insert_time, core{{/pix}} 
+                            {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                        </p>
+                    </div>
+                    <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">
+                        {{#str}}join, block_customdashboard{{/str}}
+                    </a>
+                </div>
+            </div>
+            {{/zoomclasses.items}}
+        </div>
+        {{/zoomclasses.hasitems}}
+        {{^zoomclasses.hasitems}}
+        <p class="text-muted">{{#str}}nozoomclasses, block_customdashboard{{/str}}</p>
+        {{/zoomclasses.hasitems}}
+    </div>
+</div>
