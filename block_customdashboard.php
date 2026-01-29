@@ -122,9 +122,8 @@ class block_customdashboard extends block_base {
     private function get_user_role() {
         global $USER, $DB;
 
-        // Check if user is a parent (has children).
-        $children = local_parentmanager_get_children($USER->id);
-        if (!empty($children)) {
+        // Check if user is a parent.
+        if (local_parentmanager_is_parent($USER->id)) {
             return 'parent';
         }
 
