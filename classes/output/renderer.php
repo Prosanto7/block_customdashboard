@@ -52,6 +52,7 @@ class renderer extends plugin_renderer_base {
             $childrenoptions[] = [
                 'id' => $child->id,
                 'fullname' => fullname($child),
+                'email' => $child->email,
                 'selected' => ($child->id == $selectedchildid),
             ];
         }

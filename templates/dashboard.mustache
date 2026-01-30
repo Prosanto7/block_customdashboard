@@ -33,7 +33,7 @@
         <label for="child-selector" class="form-label mb-0">{{#str}}selectchild, block_customdashboard{{/str}}</label>
         <select id="child-selector" class="form-select" style="flex: 1;">
             {{#children}}
-            <option value="{{id}}" {{#selected}}selected{{/selected}}>{{fullname}}</option>
+            <option value="{{id}}" {{#selected}}selected{{/selected}}>{{fullname}} ({{email}})</option>
             {{/children}}
         </select>
         <a href="#" id="view-child-profile" class="btn btn-sm btn-primary" title="{{#str}}viewchildprofile, block_customdashboard{{/str}}">
