@@ -39,12 +39,21 @@ class block_customdashboard extends block_base {
     }
 
     /**
+     * Set the block title based on instance configuration.
+     */
+    public function specialization() {
+        if (isset($this->config->title) && trim($this->config->title) !== '') {
+            $this->title = format_string($this->config->title, true, ['context' => $this->context]);
+        }
+    }
+
+    /**
      * Multiple instances not allowed.
      *
      * @return bool
      */
     public function instance_allow_multiple() {
-        return false;
+        return true;
     }
 
     /**
@@ -57,6 +66,15 @@ class block_customdashboard extends block_base {
             'my' => true,
             'all' => false,
         ];
+    }
+
+    /**
+     * Instance configuration is allowed.
+     *
+     * @return bool
+     */
+    public function instance_allow_config() {
+        return true;
     }
 
     /**

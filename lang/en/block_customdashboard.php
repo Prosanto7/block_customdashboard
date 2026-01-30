@@ -25,6 +25,9 @@
 $string['pluginname'] = 'Custom Dashboard';
 $string['customdashboard:addinstance'] = 'Add a new Custom Dashboard block';
 $string['customdashboard:myaddinstance'] = 'Add a new Custom Dashboard block to Dashboard';
+$string['configtitle'] = 'Block title';
+$string['configtitledesc'] = 'Leave blank to use the default title';
+$string['configtitle_help'] = 'You can set a custom title for the block here. If left blank, the default title "Custom Dashboard" will be used.';
 $string['nochildrenassigned'] = 'No children assigned to your account. Please contact the administrator.';
 $string['selectchild'] = 'Select Child';
 $string['courseprogress'] = 'Course Progress';

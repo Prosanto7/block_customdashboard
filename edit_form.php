@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for Custom Dashboard block.
+ * Configuration form for Custom Dashboard block.
  *
  * @package    block_customdashboard
  * @copyright  2026
@@ -24,11 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026013001;
-$plugin->requires  = 2023100900;
-$plugin->component = 'block_customdashboard';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1';
-$plugin->dependencies = [
-    'local_parentmanager' => ANY_VERSION,
-];
+/**
+ * Custom Dashboard block config form class.
+ */
+class block_customdashboard_edit_form extends block_edit_form {
+
+    /**
+     * Define the configuration form elements.
+     *
+     * @param MoodleQuickForm $mform The form being built.
+     */
+    protected function specific_definition($mform) {
+        // Section header title.
+        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+
+        // Block title field.
+        $mform->addElement('text', 'config_title', get_string('configtitle', 'block_customdashboard'));
+        $mform->setType('config_title', PARAM_TEXT);
+        $mform->addHelpButton('config_title', 'configtitle', 'block_customdashboard');
+    }
+}
