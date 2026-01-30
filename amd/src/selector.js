@@ -53,7 +53,6 @@ define(['jquery'], function($) {
              * @param {string} filter - The filter value ('today' or 'upcoming')
              */
             function filterZoomClasses(filter) {
-                const now = Math.floor(Date.now() / 1000);
                 const todayStart = new Date();
                 todayStart.setHours(0, 0, 0, 0);
                 const todayStartTimestamp = Math.floor(todayStart.getTime() / 1000);
@@ -73,8 +72,8 @@ define(['jquery'], function($) {
                         // Show classes happening today.
                         show = timestamp >= todayStartTimestamp && timestamp <= todayEndTimestamp;
                     } else if (filter === 'upcoming') {
-                        // Show all classes from now onwards (including today's remaining classes).
-                        show = timestamp >= now;
+                        // Show classes starting from tomorrow onwards (excludes today's classes).
+                        show = timestamp > todayEndTimestamp;
                     }
 
                     if (show) {
