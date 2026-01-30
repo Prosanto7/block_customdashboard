@@ -67,3 +67,5 @@ $string['courses'] = 'Courses';
 $string['instructor'] = 'Instructor';
 $string['instructornotassigned'] = 'Instructor Not Assigned';
 $string['childcourses'] = 'Child\'s Courses';
+$string['viewdetails'] = 'View Details';
+$string['viewchildprofile'] = 'View child profile details';

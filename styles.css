@@ -132,7 +132,7 @@
 
 /* Teachers List Scrollable */
 .block-customdashboard .teachers-list-container.teachers-scrollable {
-    max-height: 170px;
+    max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -157,7 +157,7 @@
 
 /* Zoom Classes Scrollable */
 .block-customdashboard .zoom-classes-scrollable {
-    max-height: 170px;
+    max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
 }

@@ -41,8 +41,13 @@
                         <p class="mb-1 small">
                             {{#pix}}t/email, core{{/pix}} {{email}}
                         </p>
+                        {{#hasphone}}
+                        <p class="mb-1 small">
+                            <i class="icon fa fa-phone"></i> {{phone}}
+                        </p>
+                        {{/hasphone}}
                         <p class="mb-0 small">
-                            {{#str}}courses, block_customdashboard{{/str}}: {{courseslist}}
+                            {{#pix}}i/course{{/pix}} {{courseslist}}
                         </p>
                     </div>
                 </div>

@@ -30,12 +30,15 @@
     {{! Parent Dashboard }}
     {{#haschildren}}
     <div class="child-selector-wrapper mb-3 d-flex align-items-center gap-3">
-        <label for="child-selector" class="form-label">{{#str}}selectchild, block_customdashboard{{/str}}</label>
-        <select id="child-selector" class="form-select">
+        <label for="child-selector" class="form-label mb-0">{{#str}}selectchild, block_customdashboard{{/str}}</label>
+        <select id="child-selector" class="form-select" style="flex: 1;">
             {{#children}}
             <option value="{{id}}" {{#selected}}selected{{/selected}}>{{fullname}}</option>
             {{/children}}
         </select>
+        <a href="#" id="view-child-profile" class="btn btn-sm btn-primary" title="{{#str}}viewchildprofile, block_customdashboard{{/str}}">
+            {{#pix}}i/user, core{{/pix}} {{#str}}viewdetails, block_customdashboard{{/str}}
+        </a>
     </div>
 
     {{! Zoom classes and Teachers sections for selected child }}

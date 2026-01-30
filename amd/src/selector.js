@@ -32,6 +32,16 @@ define(['jquery'], function($) {
                 window.location.href = currentUrl.toString();
             });
 
+            // View child profile button.
+            $('#view-child-profile').on('click', function(e) {
+                e.preventDefault();
+                const selectedChildId = $('#child-selector').val();
+                if (selectedChildId) {
+                    const profileUrl = M.cfg.wwwroot + '/user/profile.php?id=' + selectedChildId;
+                    window.open(profileUrl, '_blank');
+                }
+            });
+
             // Zoom classes filter.
             $('#zoom-filter').on('change', function() {
                 const filterValue = $(this).val();

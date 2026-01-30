@@ -68,6 +68,7 @@ class renderer extends plugin_renderer_base {
             'zoomclasses' => $this->get_zoom_classes($selectedchildid, 'student'),
             'teachers' => $this->get_student_teachers($selectedchildid),
             'buttonlabel' => 'join',
+            'canclickzoom' => false,
         ];
 
         // Initialize JavaScript module.
@@ -91,6 +92,7 @@ class renderer extends plugin_renderer_base {
             'zoomclasses' => $this->get_zoom_classes($userid, 'student'),
             'teachers' => $this->get_student_teachers($userid),
             'buttonlabel' => 'join',
+            'canclickzoom' => true,
         ];
 
         // Initialize JavaScript module.
@@ -112,6 +114,7 @@ class renderer extends plugin_renderer_base {
             'isteacher' => true,
             'zoomclasses' => $this->get_zoom_classes($userid, 'teacher'),
             'buttonlabel' => 'startjoin',
+            'canclickzoom' => true,
         ];
 
         // Initialize JavaScript module.
@@ -688,6 +691,14 @@ class renderer extends plugin_renderer_base {
             $zoom = $DB->get_record('zoom', ['id' => $event->zoomid], 'id, name, duration, join_url');
             
             if ($zoom) {
+                // Get course module ID for the zoom activity.
+                $cm = get_coursemodule_from_instance('zoom', $zoom->id, $event->courseid);
+                $activityurl = '';
+                if ($cm) {
+                    $activityurl = new \moodle_url('/mod/zoom/view.php', ['id' => $cm->id]);
+                    $activityurl = $activityurl->out(false);
+                }
+                
                 $items[] = [
                     'id' => $zoom->id,
                     'name' => format_string($event->name),
@@ -696,6 +707,7 @@ class renderer extends plugin_renderer_base {
                     'starttimestamp' => $event->timestart,
                     'duration' => $zoom->duration / 60, // Convert minutes to hours
                     'joinurl' => $zoom->join_url,
+                    'activityurl' => $activityurl,
                 ];
             }
         }
@@ -741,7 +753,7 @@ class renderer extends plugin_renderer_base {
             $params[] = $coursecontext->id;
 
             $teachers = $DB->get_records_sql(
-                "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.picture, u.imagealt,
+                "SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.phone2, u.picture, u.imagealt,
                         u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename
                  FROM {user} u
                  JOIN {role_assignments} ra ON ra.userid = u.id
@@ -756,6 +768,8 @@ class renderer extends plugin_renderer_base {
                         'id' => $teacher->id,
                         'fullname' => fullname($teacher),
                         'email' => $teacher->email,
+                        'phone' => !empty($teacher->phone2) ? $teacher->phone2 : '',
+                        'hasphone' => !empty($teacher->phone2),
                         'picture' => $OUTPUT->user_picture($teacher, ['size' => 50, 'link' => false]),
                         'courses' => [],
                     ];

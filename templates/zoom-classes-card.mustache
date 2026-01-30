@@ -36,6 +36,28 @@
         {{#zoomclasses.hasitems}}
         <div class="list-group">
             {{#zoomclasses.items}}
+            {{#canclickzoom}}
+            <a href="{{activityurl}}" target="_blank" class="list-group-item list-group-item-action zoom-class-item" data-timestamp="{{starttimestamp}}" style="text-decoration: none; color: inherit;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{name}}</h6>
+                        <p class="mb-1 small">
+                            {{#pix}}i/course, core{{/pix}} {{coursename}}
+                        </p>
+                        <p class="mb-1 small">
+                            {{#pix}}i/calendar, core{{/pix}} {{starttime}} 
+                        </p>
+                        <p class="mb-1 small">
+                            {{#pix}}e/insert_time, core{{/pix}}  {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
+                        </p>
+                    </div>
+                    <span class="btn btn-sm btn-primary" onclick="event.preventDefault(); window.open('{{joinurl}}', '_blank');">
+                        {{#str}}join, block_customdashboard{{/str}}
+                    </span>
+                </div>
+            </a>
+            {{/canclickzoom}}
+            {{^canclickzoom}}
             <div class="list-group-item zoom-class-item" data-timestamp="{{starttimestamp}}">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="flex-grow-1">
@@ -50,11 +72,9 @@
                             {{#pix}}e/insert_time, core{{/pix}}  {{duration}} {{#str}}minutes, block_customdashboard{{/str}}
                         </p>
                     </div>
-                    <a href="{{joinurl}}" target="_blank" class="btn btn-sm btn-primary">
-                        {{#str}}join, block_customdashboard{{/str}}
-                    </a>
                 </div>
             </div>
+            {{/canclickzoom}}
             {{/zoomclasses.items}}
         </div>
         {{/zoomclasses.hasitems}}
